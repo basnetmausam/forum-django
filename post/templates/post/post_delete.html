@@ -1,0 +1,22 @@
+{% extends 'config/_config.html' %}
+{% block title %}delete{% endblock %}
+{% load static %} 
+{% block config %}
+<div class="box text-center">
+    <div class="form-signin"> 
+        <h2>Aviso</h2>
+        <p>
+        Tem a certeza que deseja eliminar esta postagem ? 
+        <br>
+        Esta postagens será removida completamente.
+        </p>
+        <form method="POST" class="form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <button type="submit" class="btn-default btn-red">Sim</button>   
+                <button class="btn-default btn-red" onclick="location.href='{% url 'post'%}'">Cancelar</button> 
+            </div>
+        </form>
+    </div>
+</div> 
+{% endblock %}

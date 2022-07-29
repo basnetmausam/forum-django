@@ -1,0 +1,16 @@
+{% extends 'base/_base_home.html' %} {% block body_home %}
+<div class="container-box text-center lead">
+  <h1 class="h3 mb-3 fw-normal">Aviso de Segurança</h1>
+  <p>
+    <b>You have been disconnected due to inactivity.</b><br />
+    Please check your internet connection and for security you need to
+    re-identify yourself.
+  </p>
+  <button
+    class="btn-default btn-red"
+    onclick="location.href='{% url 'accounts:login' %}'"
+  >
+    Click here to log in
+  </button>
+</div>
+{% endblock %}

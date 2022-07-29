@@ -1,0 +1,191 @@
+{% extends 'base/_base_home.html' %} {% load widget_tweaks %} {% load static %}
+{% block body_home %} {% if not profile.profile.user.is_active %}
+<section class="container-sm py-5">
+  <div class="bg-light p-4 lead">
+    <div class="row">
+      <div class="col-md-1">
+        <span class="link-danger"><i class="fas fa-times fa-5x"></i></span>
+      </div>
+      <div class="col">
+        <br />
+        <h1>Profile Deactivated or Deleted from the system !!!</h1>
+      </div>
+    </div>
+  </div>
+</section>
+{% else %}
+<section class="container-box row bg-light">
+  <div class="d-flex align-items-center">
+    <div class="flex-shrink-0 p-5">
+      {% if profile.profile.image %}
+      <img
+        id="preview"
+        class="rounded mx-auto d-block"
+        src="{{profile.profile.image.thumb.url}}"
+        alt="{{profile.first_name}}"
+        width="200"
+      />
+      {% else %}
+      <img
+        id="preview"
+        class="rounded mx-auto d-block"
+        src="{% static 'images/default.png' %}"
+        alt="default"
+        alt="foto de profile"
+        height="200"
+      />
+      {% endif %} {% if profile == request.user and
+      request.user.is_authenticated %}
+      <form
+        method="post"
+        action="{% url 'profile:photo-profile' profile.pk %}"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <div class="custom-file">
+          <label class="label-input-photo custom-file-label" for="image"
+            ><i class="fas fa-edit"></i
+          ></label>
+          <input
+            type="file"
+            onchange="this.form.submit()"
+            value="Update"
+            class="custom-file-input form-control"
+            id="image"
+            name="image"
+          />
+        </div>
+      </form>
+      {% endif %}
+    </div>
+
+    <div class="flex-grow-1 ms-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex flex-row align-items-center">
+          <h1>{{profile.first_name}} {{profile.last_name}}</h1>
+        </div>
+        <form
+          method="POST"
+          action="{% url 'profile:like-profile' profile.pk %}"
+        >
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{request.path}}" />
+          <button type="submit" class="btn">
+            <i class="fas fa-heart fa-2x s-label"></i
+            ><span class="h3 mx-2 s-label"
+              >{{profile.profile.likes.all.count}}</span
+            >
+          </button>
+        </form>
+      </div>
+      <p>Username: {{profile.user_name}}</p>
+      <div class="title-container">
+        <h5>About:</h5>
+      </div>
+      <p>{{ profile.profile.description }}</p>
+      <div class="row">
+        <div class="col-6">
+          <h5>I work on: {{profile.profile.occupation}}</h5>
+          <p>City: {{profile.profile.city}} {{profile.profile.country}}</p>
+        </div>
+        <div class="col-6">
+          <h5>Social networks:</h5>
+          {% for n in profile.network.all %} {% if n.url != '' and n.url !=
+          'None' %}
+          <a href="{{n.url}}" target="_blank" class="s-label"
+            ><i class="fab fa-{{n.name}} mx-2"></i
+          ></a>
+          {% endif %} {% endfor %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col py-2">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex flex-row align-items-center">
+              <span>in join: {{profile.date_joined}}</span>
+            </div>
+            {% if profile == request.user and request.user.is_authenticated %}
+            <button
+              class="btn-default btn-red"
+              onclick="location.href='http://127.0.0.1:8000/profile/edit-profile'"
+            >
+              <i class="fas fa-cog mx-2"></i>Edit profile
+            </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<hr />
+<section class="row">
+  <div class="container-box col-md-3 p-3 bg-light">
+    <h2>Perguntas</h2>
+    <span class="fw-bold py-3">Title: </span>
+    <form
+      action="{% url 'profile:user-profile' profile.profile.user.user_name %}"
+      method="get"
+    >
+      <input
+        name="title"
+        type="text"
+        value="{{request.GET.title}}"
+        class="form-control"
+        placeholder="Search..."
+      />
+    </form>
+    <br />
+    {% if profile == request.user and request.user.is_authenticated %}
+    <a href="{%  url 'profile:config' %}"
+      ><button class="btn-default btn-red" type="button">
+        Configurações
+      </button></a
+    >
+    {% endif %} {% if request.GET.title %}
+    <a href="{%  url 'profile:user-profile' profile.profile.user.user_name %}"
+      ><button class="btn-default btn-red" type="button">Reset</button></a
+    >
+    {% endif %}
+  </div>
+  <div class="col-md-9">
+    {% for post in page_obj %}
+    <div class="container-box mt-2">
+      <div class="d-flex justify-content-end align-items-center">
+        {% if profile == request.user and request.user.is_authenticated %}
+        <a class="s-label" href="{%  url 'post-update' post.pk %}"
+          ><i class="fas fa-cog fa-2x mx-2"></i
+        ></a>
+        {% endif %}
+      </div>
+      {% include 'post/_card.html' %}
+    </div>
+    {% endfor %}
+    <div class="p-4">
+      {% if page_obj.paginator.num_pages > 1 %} {% include 'base/_page.html' %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+<script>
+  $('#image').change(function (event) {
+    readURL(this)
+  })
+  function readURL(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader()
+      var filename = $('#image').val()
+      filename = filename.substring(filename.lastIndexOf('\\') + 1)
+      reader.onload = function (e) {
+        debugger
+        $('#preview').attr('src', e.target.result)
+        $('#preview').hide()
+        $('#preview').fadeIn(500)
+        $('.custom-file-label').text(filename)
+      }
+      reader.readAsDataURL(input.files[0])
+    }
+  }
+</script>
+{% endblock %}
