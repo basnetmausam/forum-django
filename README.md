@@ -1,7 +1,3 @@
-### Previa
-
-<img src="git/demo.png?raw=true"/> 
- 
 ## This project was made with:
 
 * [Python 3.10.2](https://www.python.org/)
